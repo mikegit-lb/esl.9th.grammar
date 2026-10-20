@@ -610,7 +610,7 @@ a { color: inherit; }
 
 .exercise-options {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
   gap: 8px;
 }
 
@@ -649,6 +649,8 @@ a { color: inherit; }
 .exercise-input:focus, .match-select:focus { outline: 3px solid #b6d4fa; outline-offset: 1px; border-color: var(--blue); }
 .word-bank { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
 .build-token, .chosen-word { padding: 6px 11px; }
+.exercise-card[data-exercise-type="sequence"] .build-token,
+.exercise-card[data-exercise-type="sequence"] .chosen-word { flex: 1 1 100%; text-align: left; line-height: 1.45; }
 .build-token.is-used { opacity: .42; }
 .build-tray { display: flex; flex-wrap: wrap; align-items: center; gap: 7px; min-height: 49px; margin-bottom: 9px; padding: 7px; border: 1px dashed #9bb2ce; border-radius: 6px; background: #f8fbff; }
 .chosen-word { border-color: #e5b478; background: #fff7ec; color: #754516; }

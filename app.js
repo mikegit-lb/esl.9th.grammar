@@ -371,12 +371,12 @@ function renderExercises(exercises) {
             return '<button class="choice-option" type="button" data-choice="' + optionIndex + '" aria-pressed="false">' + escapeHtml(option) + '</button>';
           }).join("") +
         '</div>';
-    } else if (exercise.type === "complete" || exercise.type === "fix") {
+    } else if (exercise.type === "complete" || exercise.type === "fix" || exercise.type === "transform") {
       body = '<p class="exercise-prompt">' + escapeHtml(exercise.prompt) + '</p>' +
-        '<label class="exercise-input-label" for="exercise-input-' + activeUnit + '-' + index + '">Your answer</label>' +
+        '<label class="exercise-input-label" for="exercise-input-' + activeUnit + '-' + index + '">' + escapeHtml(exercise.inputLabel || "Your answer") + '</label>' +
         '<input class="exercise-input" id="exercise-input-' + activeUnit + '-' + index + '" type="text" autocomplete="off">';
-    } else if (exercise.type === "build") {
-      body = '<p class="exercise-prompt">Tap the words in the correct order.</p>' +
+    } else if (exercise.type === "build" || exercise.type === "sequence") {
+      body = '<p class="exercise-prompt">' + escapeHtml(exercise.instruction || "Tap the words in the correct order.") + '</p>' +
         '<div class="word-bank" role="group" aria-label="Words to arrange">' +
           exercise.tokens.map(function (token, tokenIndex) {
             return '<button class="build-token" type="button" data-word-index="' + tokenIndex + '">' + escapeHtml(token) + '</button>';
@@ -414,9 +414,9 @@ function renderExercises(exercises) {
   }).join("");
 
   return '<section class="practice" aria-labelledby="practice-title">' +
-    '<div class="practice-header"><h3 id="practice-title">Five exercises for this unit</h3>' +
+    '<div class="practice-header"><h3 id="practice-title">Five varied exercises for this unit</h3>' +
       '<span class="practice-count">7 QUESTIONS · 56 TOTAL</span></div>' +
-    '<p class="practice-instruction">Try five different activities: choose, complete, build, match, and correct.</p>' +
+    '<p class="practice-instruction">Apply grammar in context, complete and rewrite sentences, match forms, edit errors, and order dialogue.</p>' +
     '<div class="exercise-list">' + cards + '</div>' +
   '</section>';
 }
@@ -460,14 +460,14 @@ function checkExercise(card) {
       if (index === Number(selected) && !correct) button.classList.add("is-wrong");
     });
     setExerciseFeedback(card, correct, correct ? exercise.why : "The correct answer is “" + exercise.answer + "”. " + exercise.why);
-  } else if (exercise.type === "complete" || exercise.type === "fix") {
+  } else if (exercise.type === "complete" || exercise.type === "fix" || exercise.type === "transform") {
     const input = card.querySelector(".exercise-input");
     if (!input.value.trim()) { feedback.textContent = "Write your answer first."; input.focus(); return; }
     const accepted = [exercise.answer].concat(exercise.accepted || []).map(normalizeAnswer);
     const correct = accepted.indexOf(normalizeAnswer(input.value)) !== -1;
     input.disabled = true;
     setExerciseFeedback(card, correct, correct ? exercise.why : "One correct answer is: “" + exercise.answer + "” " + exercise.why);
-  } else if (exercise.type === "build") {
+  } else if (exercise.type === "build" || exercise.type === "sequence") {
     let sequence = [];
     try { sequence = JSON.parse(card.dataset.buildSequence || "[]"); } catch (error) { sequence = []; }
     if (sequence.length !== exercise.tokens.length) { feedback.textContent = "Use every word to build the sentence."; return; }

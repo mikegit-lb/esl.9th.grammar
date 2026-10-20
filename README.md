@@ -10,7 +10,7 @@ Open index.html in a browser. The lesson navigation, answer feedback, and unit s
 
 - Eight units with grammar summaries, patterns, and examples
 - Contextual mini-dialogues for each unit
-- Five distinct exercise formats per unit: multiple choice, completion, sentence building, matching, and correction
+- Five varied exercises per unit, including contextual choices, cloze completion, sentence transformations, dialogue ordering, matching, and editing
 - Seven scored prompts per unit and 56 prompts across the eight units
 - Responsive layout for desktop and mobile screens
 
