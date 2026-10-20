@@ -361,10 +361,24 @@ function renderLesson() {
 
 function renderExercises(exercises) {
   const cards = exercises.map(function (exercise, index) {
-    const questionCount = exercise.type === "match" ? exercise.pairs.length : 1;
+    const questionCount = exercise.type === "match" ? exercise.pairs.length : exercise.type === "reading" ? exercise.questions.length : 1;
     let body = "";
 
-    if (exercise.type === "choice") {
+    if (exercise.type === "reading") {
+      body = '<article class="reading-passage" aria-label="B1 reading passage">' +
+          '<h4>' + escapeHtml(exercise.passageTitle) + '</h4>' +
+          '<p>' + escapeHtml(exercise.passage) + '</p>' +
+        '</article>' +
+        '<div class="reading-questions">' + exercise.questions.map(function (question, questionIndex) {
+          return '<fieldset class="reading-question" data-reading-question-index="' + questionIndex + '">' +
+            '<legend>' + (questionIndex + 1) + '. ' + escapeHtml(question.prompt) + '</legend>' +
+            '<div class="reading-options">' + question.options.map(function (option, optionIndex) {
+              return '<button class="reading-option" type="button" data-reading-choice="' + optionIndex + '" aria-pressed="false">' + escapeHtml(option) + '</button>';
+            }).join("") + '</div>' +
+            '<p class="reading-question-feedback" aria-live="polite"></p>' +
+          '</fieldset>';
+        }).join("") + '</div>';
+    } else if (exercise.type === "choice") {
       body = '<p class="exercise-prompt">' + escapeHtml(exercise.prompt) + '</p>' +
         '<div class="exercise-options" role="group" aria-label="Answer choices">' +
           exercise.options.map(function (option, optionIndex) {
@@ -414,9 +428,9 @@ function renderExercises(exercises) {
   }).join("");
 
   return '<section class="practice" aria-labelledby="practice-title">' +
-    '<div class="practice-header"><h3 id="practice-title">Five varied exercises for this unit</h3>' +
+    '<div class="practice-header"><h3 id="practice-title">B1 reading & grammar challenge</h3>' +
       '<span class="practice-count">7 QUESTIONS · 56 TOTAL</span></div>' +
-    '<p class="practice-instruction">Apply grammar in context, complete and rewrite sentences, match forms, edit errors, and order dialogue.</p>' +
+    '<p class="practice-instruction">Five activities per unit: extra-hard B1 reading plus realistic grammar choices, completion, rewriting, and editing.</p>' +
     '<div class="exercise-list">' + cards + '</div>' +
   '</section>';
 }
@@ -460,6 +474,28 @@ function checkExercise(card) {
       if (index === Number(selected) && !correct) button.classList.add("is-wrong");
     });
     setExerciseFeedback(card, correct, correct ? exercise.why : "The correct answer is “" + exercise.answer + "”. " + exercise.why);
+  } else if (exercise.type === "reading") {
+    const questions = Array.from(card.querySelectorAll(".reading-question"));
+    if (questions.some(function (question) { return question.dataset.selectedChoice === undefined; })) {
+      feedback.textContent = "Answer all three reading questions first.";
+      return;
+    }
+    let score = 0;
+    exercise.questions.forEach(function (item, index) {
+      const question = questions[index];
+      const selected = Number(question.dataset.selectedChoice);
+      const correct = selected === item.answer;
+      if (correct) score += 1;
+      question.querySelectorAll(".reading-option").forEach(function (button, optionIndex) {
+        button.disabled = true;
+        if (optionIndex === item.answer) button.classList.add("is-correct");
+        if (optionIndex === selected && !correct) button.classList.add("is-wrong");
+      });
+      const result = question.querySelector(".reading-question-feedback");
+      result.className = "reading-question-feedback " + (correct ? "is-correct" : "is-wrong");
+      result.textContent = (correct ? "Correct. " : "Correct answer: " + item.options[item.answer] + ". ") + item.why;
+    });
+    setExerciseFeedback(card, score === exercise.questions.length, score + "/" + exercise.questions.length + " reading answers correct. Review the notes above.");
   } else if (exercise.type === "complete" || exercise.type === "fix" || exercise.type === "transform") {
     const input = card.querySelector(".exercise-input");
     if (!input.value.trim()) { feedback.textContent = "Write your answer first."; input.focus(); return; }
@@ -507,6 +543,18 @@ function selectUnit(index) {
 lesson.addEventListener("click", function (event) {
   const card = event.target.closest(".exercise-card");
   if (!card) return;
+
+  const readingOption = event.target.closest(".reading-option");
+  if (readingOption && card.dataset.checked !== "true") {
+    const question = readingOption.closest(".reading-question");
+    question.dataset.selectedChoice = readingOption.dataset.readingChoice;
+    question.querySelectorAll(".reading-option").forEach(function (button) {
+      button.setAttribute("aria-pressed", String(button === readingOption));
+      button.classList.toggle("is-selected", button === readingOption);
+    });
+    question.querySelector(".reading-question-feedback").textContent = "";
+    return;
+  }
 
   const choice = event.target.closest(".choice-option");
   if (choice && card.dataset.checked !== "true") {

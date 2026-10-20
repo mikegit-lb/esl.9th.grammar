@@ -10,8 +10,9 @@ Open index.html in a browser. The lesson navigation, answer feedback, and unit s
 
 - Eight units with grammar summaries, patterns, and examples
 - Contextual mini-dialogues for each unit
-- Five varied exercises per unit, including contextual choices, cloze completion, sentence transformations, dialogue ordering, matching, and editing
-- Seven scored prompts per unit and 56 prompts across the eight units
+- Eight extra-hard B1 reading passages, each with three comprehension questions and explanations
+- Four realistic grammar challenges per unit: contextual choice, cloze completion, sentence transformation, and editing
+- Five activities and seven scored prompts per unit; 56 prompts across the eight units
 - Responsive layout for desktop and mobile screens
 
 The lesson data lives in app.js, exercise data in exercises.js, and visual styles in styles.css.
