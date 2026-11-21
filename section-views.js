@@ -23,13 +23,16 @@ function sectionJumpBar(summaryText, linkLabel) {
 window.SectionViews.overview = function (unit, content) {
   const o = content.overview || {};
   const leadIn = o.leadIn || {};
-  return '<section class="focus-block" aria-labelledby="leadin-title">' +
-      '<p class="focus-label">Lead-in</p>' +
-      '<h3 id="leadin-title">' + escapeHtml(leadIn.prompt || unit.title) + '</h3>' +
-      '<ul class="topic-chips" aria-label="Topics to talk about">' + (leadIn.topics || []).map(function (topic) {
-        return '<li class="quiz-chip">' + escapeHtml(topic) + '</li>';
-      }).join("") + '</ul>' +
-    '</section>' +
+  // Lead-in is optional: a unit without topics simply opens on its panels.
+  const leadInBlock = listOf(leadIn.topics).length
+    ? '<section class="focus-block" aria-labelledby="leadin-title">' +
+        '<h3 id="leadin-title">' + escapeHtml(leadIn.prompt || unit.title) + '</h3>' +
+        '<ul class="topic-chips" aria-label="Topics to talk about">' + listOf(leadIn.topics).map(function (topic) {
+          return '<li class="quiz-chip">' + escapeHtml(topic) + '</li>';
+        }).join("") + '</ul>' +
+      '</section>'
+    : "";
+  return leadInBlock +
     '<div class="lesson-grid overview-grid">' +
       viewPanel("subthemes-title", "Sub-themes", viewList(o.subThemes, "view-list")) +
       viewPanel("functions-title", "Functions", viewList(o.functions, "view-list")) +
@@ -51,8 +54,7 @@ window.SectionViews.vocabulary = function (unit, content) {
   const all = [];
   (v.groups || []).forEach(function (group) { all.push.apply(all, group.items); });
   const activities = currentActivities();
-  const questionTotal = activities.reduce(function (n, a) { return n + Core.countQuestions(a); }, 0);
-  return sectionJumpBar(all.length + " key terms · " + activities.length + " practice sets (" + questionTotal + " questions)", "Jump to vocabulary practice ↓") +
+  return sectionJumpBar(all.length + " key terms · " + activities.length + " practice sets", "Jump to vocabulary practice ↓") +
     Flashcards.html(activeUnit, all) + '<div class="lesson-grid vocab-grid">' + groups + '</div>' +
     renderExercises(activities, { heading: "Vocabulary practice" });
 };
@@ -169,7 +171,7 @@ window.SectionViews.speaking = function (unit, content) {
         return '<li>' + escapeHtml(tip) + '</li>';
       }).join("") + '</ol>')
     : "";
-  return sectionJumpBar(tasks.length + " speaking & role-play tasks · " + questionTotal + " personal prompts", "Jump to speaking tasks ↓") +
+  return sectionJumpBar(questionTotal + " personal prompts", "Jump to speaking tasks ↓") +
     '<div class="lesson-grid speaking-top-grid">' + examTips + interviewPanel + '</div>' + privacy +
     renderExercises(tasks, {
       heading: "Speaking practice",

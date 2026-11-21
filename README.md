@@ -9,7 +9,7 @@ Open index.html in a browser. The lesson navigation, answer feedback, and unit s
 ## Contents
 
 - Units 1-2 each have five tabs: Overview, Vocabulary, Speaking, Grammar, Reading
-  - Overview: sub-themes, functions, social language, pronunciation focus and a lead-in
+  - Overview: sub-themes, functions, social language, and an optional lead-in
   - Vocabulary: term lists with meanings and examples, plus word-bank, matching and quiz activities (Unit 1: 72 terms and 77 scored questions, Unit 2: 64 terms and 94), and a word review of spaced flashcards over every term (72 words in Unit 1, 64 in Unit 2)
   - Speaking: pronunciation sound groups plus extras (4 per unit), read-aloud sentences, exam tips, practice questions with model answers, timed talks and role-plays (Unit 1: 136 speaking questions, 4 timed talk topics, 5 role-plays; Unit 2: 186 questions, 4 timed talk topics, 6 role-plays)
   - Grammar: contextual choice, cloze, transformation, editing, build-a-sentence and quiz activities plus a lesson with pattern blocks, dialogues and a Common mistakes panel (Unit 1: 15 patterns, 11 common mistakes and 150 scored questions; Unit 2: 13 patterns, 12 common mistakes and 181 scored questions)

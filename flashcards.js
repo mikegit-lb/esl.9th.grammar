@@ -1,4 +1,4 @@
-// Spaced vocabulary review (Leitner boxes). Needs Core, `progress`, listenButton, escapeHtml and viewPanel at call time.
+// Spaced vocabulary review (Leitner boxes). Needs Core, `progress`, escapeHtml and viewPanel at call time.
 (function () {
   const BATCH = 10;
   const decks = {};
@@ -32,13 +32,17 @@
     }
     return head + '<p class="fc-term">' + escapeHtml(item.term) + '</p>' +
       '<p class="vocab-example">' + escapeHtml(item.example) + '</p>' +
-      (item.audio === false ? "" : listenButton(item.term) + listenButton(item.example, "example")) +
       '<div class="fc-answers"><button class="speak-toggle" type="button" data-fc-knew>I knew it</button>' +
       '<button class="speak-toggle" type="button" data-fc-again>Still learning</button></div>';
   }
 
   function endHtml(unit, session) {
-    return '<p>You knew ' + session.knew + ' of ' + session.queue.length + (session.queue.length === 1 ? ' word.' : ' words.') + '</p>' +
+    const total = session.queue.length;
+    // Known words move to longer gaps (Core.leitnerUpdate); missed words are due again straight away.
+    const summary = session.knew === total
+      ? '<p><strong>Clean sweep:</strong> you knew all ' + total + (total === 1 ? ' word.' : ' words.') + ' They move on to longer gaps.</p>'
+      : '<p>You knew ' + session.knew + ' of ' + total + (total === 1 ? ' word.' : ' words.') + ' The rest come back sooner.</p>';
+    return summary +
       (dueItems(unit, 1).length ? '<button class="speak-toggle" type="button" data-fc-more>Review more</button>' : "");
   }
 

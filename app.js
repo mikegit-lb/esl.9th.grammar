@@ -61,8 +61,11 @@ const nav = document.getElementById("unit-nav");
 const lesson = document.getElementById("lesson");
 const themesToggle = document.getElementById("themes-toggle");
 const progress = Core.createStore((function () { try { return window.localStorage; } catch (e) { return null; } })());
-let activeUnit = 0;
-let activeSection = "overview";
+// The last unit and tab are kept in this browser, so a return visit picks up where the learner left off.
+const savedView = progress.get("view", null) || {};
+let activeUnit = Number.isInteger(savedView.unit) && savedView.unit >= 0 && savedView.unit < units.length ? savedView.unit : 0;
+let activeSection = typeof savedView.section === "string" ? savedView.section : "overview";
+function saveView() { progress.set("view", { unit: activeUnit, section: activeSection }); }
 
 function escapeHtml(value) {
   return String(value)
@@ -123,7 +126,6 @@ function renderGrammarBlock(unit) {
   }).join("");
 
   return '<section class="focus-block" aria-labelledby="focus-title">' +
-      '<p class="focus-label">Grammar focus</p>' +
       '<h3 id="focus-title">' + escapeHtml(unit.focus) + '</h3>' +
       '<p class="focus-summary">' + escapeHtml(unit.summary) + '</p>' +
       '<ul class="example-list">' + examples + '</ul>' +
@@ -171,10 +173,7 @@ function renderSectionBody(unit, content) {
   const activities = currentActivities();
   if (activeSection === "grammar") {
     const mergedLesson = Object.assign({}, unit, content && content.lesson);
-    const questionTotal = activities.reduce(function (n, a) { return n + Core.countQuestions(a); }, 0);
-    const jump = typeof sectionJumpBar === "function"
-      ? sectionJumpBar((mergedLesson.patterns || []).length + " patterns · " + activities.length + " practice sets (" + questionTotal + " questions)", "Jump to grammar practice ↓")
-      : "";
+    const jump = sectionJumpBar((mergedLesson.patterns || []).length + " patterns · " + activities.length + " practice sets", "Jump to grammar practice ↓");
     return jump + renderGrammarBlock(mergedLesson) + renderExercises(activities, { heading: "Grammar practice" });
   }
   return renderExercises(activities, { heading: "Reading practice" });
@@ -185,9 +184,10 @@ function renderLesson() {
   const unit = units[activeUnit];
   const content = unitContentFor(activeUnit);
   const sections = Core.getSections(content);
+  activeSection = Core.resolveSection(sections, activeSection);
+  saveView();
   const heading =
     '<header class="unit-heading">' +
-      '<span class="unit-index">' + unit.number + ' /</span>' +
       '<h2>' + escapeHtml(unit.title) + '</h2>' +
     '</header>';
 
@@ -202,58 +202,63 @@ function renderLesson() {
 }
 
 // options (section views only): heading overrides the legacy title; countText overrides the "N QUESTIONS" badge.
+// One exercise card. `open` opens it on first render; Try again re-renders it open.
+function renderExerciseCard(exercise, index, open) {
+  const questionCount = Core.countQuestions(exercise);
+  const custom = (window.ExerciseTypes || {})[exercise.type];
+  const unscored = Boolean(custom && custom.unscored);
+  let body = "";
+
+  if (custom && custom.render) {
+    body = custom.render(exercise, activeUnit + "-" + index);
+  } else if (exercise.type === "reading") {
+    body = '<article class="reading-passage" aria-label="Reading passage">' +
+        '<h4>' + escapeHtml(exercise.passageTitle) + '</h4>' +
+        '<p>' + escapeHtml(exercise.passage) + '</p>' +
+      '</article>' +
+      '<div class="reading-questions">' + exercise.questions.map(function (question, questionIndex) {
+        return '<fieldset class="reading-question" data-reading-question-index="' + questionIndex + '">' +
+          '<legend>' + (questionIndex + 1) + '. ' + escapeHtml(question.prompt) + '</legend>' +
+          '<div class="reading-options">' + question.options.map(function (option, optionIndex) {
+            return '<button class="reading-option" type="button" data-reading-choice="' + optionIndex + '" aria-pressed="false">' + escapeHtml(option) + '</button>';
+          }).join("") + '</div>' +
+          '<p class="reading-question-feedback" aria-live="polite"></p>' +
+        '</fieldset>';
+      }).join("") + '</div>';
+  } else if (exercise.type === "match") {
+    body = '<p class="exercise-prompt">Choose the description that matches each example.</p>' +
+      '<div class="match-list">' + exercise.pairs.map(function (pair, pairIndex) {
+        return '<div class="match-row" data-match-index="' + pairIndex + '">' +
+          '<span class="match-example">' + escapeHtml(pair.left) + '</span>' +
+          '<select class="match-select" aria-label="Match for ' + escapeHtml(pair.left) + '">' +
+            '<option value="">Choose a match</option>' +
+            Core.shuffle(exercise.choices, activeUnit + "-" + activeSection + "-" + index).map(function (choice) {
+              return '<option value="' + escapeHtml(choice) + '">' + escapeHtml(choice) + '</option>';
+            }).join("") +
+          '</select>' +
+          '<span class="match-answer"></span>' +
+        '</div>';
+      }).join("") + '</div>';
+  }
+
+  const indexLabel = (index + 1 < 10 ? "0" : "") + (index + 1);
+  return '<details class="exercise-card" data-exercise-index="' + index + '" data-exercise-type="' + exercise.type + '"' + (open ? ' open' : '') + '>' +
+    '<summary><span class="exercise-card-index">' + indexLabel + '</span>' +
+      '<span class="exercise-card-title">' + escapeHtml(exercise.title) + '</span>' +
+      '<span class="exercise-question-count">' + (unscored ? custom.practisedCount(exercise) + '/' + custom.practiceTotal(exercise) + ' practised' : questionCount + ' questions') + '</span>' +
+    '</summary>' +
+    '<div class="exercise-content">' + body +
+      (unscored ? '' : '<div class="exercise-actions"><button class="exercise-check" type="button">Check answer</button>' +
+        '<p class="exercise-feedback" role="status" aria-live="polite"></p></div>') +
+    '</div>' +
+  '</details>';
+}
+
 function renderExercises(exercises, options) {
   options = options || {};
   if (!exercises.length) return "";
   const cards = exercises.map(function (exercise, index) {
-    const questionCount = Core.countQuestions(exercise);
-    const custom = (window.ExerciseTypes || {})[exercise.type];
-    const unscored = Boolean(custom && custom.unscored);
-    let body = "";
-
-    if (custom && custom.render) {
-      body = custom.render(exercise, activeUnit + "-" + index);
-    } else if (exercise.type === "reading") {
-      body = '<article class="reading-passage" aria-label="Reading passage">' +
-          '<h4>' + escapeHtml(exercise.passageTitle) + '</h4>' +
-          '<p>' + escapeHtml(exercise.passage) + '</p>' +
-        '</article>' +
-        '<div class="reading-questions">' + exercise.questions.map(function (question, questionIndex) {
-          return '<fieldset class="reading-question" data-reading-question-index="' + questionIndex + '">' +
-            '<legend>' + (questionIndex + 1) + '. ' + escapeHtml(question.prompt) + '</legend>' +
-            '<div class="reading-options">' + question.options.map(function (option, optionIndex) {
-              return '<button class="reading-option" type="button" data-reading-choice="' + optionIndex + '" aria-pressed="false">' + escapeHtml(option) + '</button>';
-            }).join("") + '</div>' +
-            '<p class="reading-question-feedback" aria-live="polite"></p>' +
-          '</fieldset>';
-        }).join("") + '</div>';
-    } else if (exercise.type === "match") {
-      body = '<p class="exercise-prompt">Choose the description that matches each example.</p>' +
-        '<div class="match-list">' + exercise.pairs.map(function (pair, pairIndex) {
-          return '<div class="match-row" data-match-index="' + pairIndex + '">' +
-            '<span class="match-example">' + escapeHtml(pair.left) + '</span>' +
-            '<select class="match-select" aria-label="Match for ' + escapeHtml(pair.left) + '">' +
-              '<option value="">Choose a match</option>' +
-              Core.shuffle(exercise.choices, activeUnit + "-" + activeSection + "-" + index).map(function (choice) {
-                return '<option value="' + escapeHtml(choice) + '">' + escapeHtml(choice) + '</option>';
-              }).join("") +
-            '</select>' +
-            '<span class="match-answer"></span>' +
-          '</div>';
-        }).join("") + '</div>';
-    }
-
-    const indexLabel = (index + 1 < 10 ? "0" : "") + (index + 1);
-    return '<details class="exercise-card" data-exercise-index="' + index + '" data-exercise-type="' + exercise.type + '"' + (index === 0 ? ' open' : '') + '>' +
-      '<summary><span class="exercise-card-index">' + indexLabel + '</span>' +
-        '<span class="exercise-card-title">' + escapeHtml(exercise.title) + '</span>' +
-        '<span class="exercise-question-count">' + (unscored ? custom.practisedCount(exercise) + '/' + custom.practiceTotal(exercise) + ' practised' : questionCount + ' questions') + '</span>' +
-      '</summary>' +
-      '<div class="exercise-content">' + body +
-        (unscored ? '' : '<div class="exercise-actions"><button class="exercise-check" type="button">Check answer</button>' +
-          '<p class="exercise-feedback" role="status" aria-live="polite"></p></div>') +
-      '</div>' +
-    '</details>';
+    return renderExerciseCard(exercise, index, index === 0);
   }).join("");
 
   const total = exercises.reduce(function (sum, exercise) { return sum + Core.countQuestions(exercise); }, 0);
@@ -328,7 +333,36 @@ function checkExercise(card) {
 
 function markChecked(card) {
   card.dataset.checked = "true";
-  card.querySelector(".exercise-check").disabled = true;
+  const check = card.querySelector(".exercise-check");
+  check.disabled = true;
+  // Try again clears the answers and re-renders the card, so a wrong answer can be retried.
+  check.insertAdjacentHTML("afterend", '<button class="exercise-retry" type="button" data-exercise-retry>Try again</button>');
+  checkPracticeComplete(card);
+}
+
+function retryExercise(card) {
+  const index = Number(card.dataset.exerciseIndex);
+  const exercise = currentActivities()[index];
+  if (!exercise) return;
+  card.outerHTML = renderExerciseCard(exercise, index, true);
+  const fresh = lesson.querySelector('.exercise-card[data-exercise-index="' + index + '"]');
+  if (fresh) fresh.querySelector("summary").focus();
+}
+
+// When every scored set in this section is checked, say so once and offer the next tab.
+function checkPracticeComplete(card) {
+  const panel = card.closest(".practice");
+  if (!panel || panel.querySelector(".practice-complete")) return;
+  const scored = panel.querySelectorAll(".exercise-card .exercise-check").length;
+  const checked = panel.querySelectorAll('.exercise-card[data-checked="true"]').length;
+  if (!scored || checked !== scored) return;
+  const sections = Core.getSections(unitContentFor(activeUnit));
+  const at = sections.map(function (section) { return section.id; }).indexOf(activeSection);
+  const next = sections[at + 1];
+  panel.insertAdjacentHTML("beforeend",
+    '<div class="practice-complete" role="status"><p><strong>Every set here is checked.</strong> Review any “Not quite” answers above, or carry on.</p>' +
+    (next ? '<button class="speak-toggle" type="button" data-go-section="' + next.id + '">Next: ' + escapeHtml(next.label) + ' →</button>' : "") +
+    '</div>');
 }
 
 function selectUnit(index) {
@@ -362,6 +396,12 @@ lesson.addEventListener("keydown", function (event) {
 lesson.addEventListener("click", function (event) {
   const tab = event.target.closest('[role="tab"]');
   if (tab) { selectSection(tab.dataset.section); return; }
+
+  const goSection = event.target.closest("[data-go-section]");
+  if (goSection) { selectSection(goSection.dataset.goSection); return; }
+
+  const retry = event.target.closest("[data-exercise-retry]");
+  if (retry) { retryExercise(retry.closest(".exercise-card")); return; }
 
   const card = event.target.closest(".exercise-card");
   if (!card) return;

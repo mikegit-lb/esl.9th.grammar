@@ -14,24 +14,9 @@ window.unitContent[0] = Object.assign(window.unitContent[0] || {}, {
     ],
     socialLanguage: [
       "Hello! My name is Selin, and I'm from Türkiye.",
-      "Pleased to meet you, Selin!",
-      "Where are you from, and which languages can you speak?",
       "I'm Italian. I can speak Italian and a little English.",
-      "What's the capital of Italy?",
       "Visitors can walk through the old town and take a boat trip."
-    ],
-    leadIn: {
-      prompt: "Look at the pages and say what they are about. Which words and phrases do they remind you of?",
-      topics: [
-        "Six greetings: Szia, 안녕, Здрасти, Hei, Merhaba, Cześć",
-        "A school building in Izmir",
-        "A castle on a hill",
-        "Ancient ruins",
-        "A palace by a river",
-        "Colourful old town houses",
-        "Stone rock art"
-      ]
-    }
+    ]
   },
 
   vocabulary: {
@@ -269,24 +254,6 @@ window.unitContent[0] = Object.assign(window.unitContent[0] || {}, {
           { prompt: "A: ___ you speak German?   B: No, I can't.", options: ["Are", "Is", "Does", "Can"], answer: "Can", why: "The short answer No, I can't matches a question that begins with Can; Are, Is and Does do not fit after you." },
           { prompt: "He's from Germany, so he's ___.", options: ["Germany", "German", "Germans", "Germanic"], answer: "German", why: "The nationality of a person from Germany is German." },
           { prompt: "I'm Hungarian, so I ___ speak Hungarian and a little English.", options: ["can", "will", "am", "is"], answer: "can", why: "Use can plus a base verb to talk about a language you are able to speak." }
-        ]
-      },
-      {
-        type: "quiz",
-        title: "Tourist information: word bank",
-        source: "Unit 1 · Vocabulary a · p.28",
-        instruction: "You are reading a leaflet for tourists. Complete each sentence with a word or phrase from the bank. Two are extra.",
-        wordBank: ["museum", "bridge", "beach", "mosque", "market", "national park", "guided tour", "souvenirs", "boat trip", "castle", "ancient ruin"],
-        items: [
-          { prompt: "Visit the ___ near the harbour to see old coins and pictures of the city's history.", answer: "museum", why: "A museum shows old objects and teaches visitors about the past." },
-          { prompt: "You can walk across the old stone ___ at sunset and look at the river.", answer: "bridge", why: "A bridge carries a path over a river." },
-          { prompt: "Children can build sandcastles and swim at the ___ all summer.", answer: "beach", why: "A beach is a sandy place next to the sea." },
-          { prompt: "Please take off your shoes before you enter the ___, which is a place of prayer.", answer: "mosque", why: "A mosque is a building where Muslims pray." },
-          { prompt: "At the Sunday ___, you can buy fresh fruit, cheese and bread.", answer: "market", why: "A market is a place where people sell food and other things." },
-          { prompt: "Hikers can see lakes and forests in the ___, but they must not leave rubbish there.", answer: "national park", why: "A national park is a large area of nature that people protect." },
-          { prompt: "Join a ___ and a guide will walk with you through the old town and tell you stories about it.", answer: "guided tour", why: "A guided tour is a visit with a guide who explains the place." },
-          { prompt: "Small ___ such as postcards and magnets are cheap presents for your friends.", answer: "souvenirs", why: "Souvenirs are small things that people buy to remember a trip." },
-          { prompt: "A ___ on the river is a relaxing way to see the town from the water.", answer: "boat trip", why: "A boat trip is a short journey on the water for fun." }
         ]
       }
     ]

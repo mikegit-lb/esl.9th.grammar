@@ -8,6 +8,7 @@
   --blue-pale-2: #f4faff;
   --orange: #f47a16;
   --orange-pale: #fff4e8;
+  --orange-ink: #a64f08;
   --line: #d7e1ee;
   --surface: #ffffff;
   --sidebar: #fbfcfe;
@@ -22,6 +23,8 @@
 }
 
 * { box-sizing: border-box; }
+
+::selection { background: #bcd9ff; color: var(--ink); }
 
 html {
   min-width: 320px;
@@ -83,24 +86,6 @@ a { color: inherit; }
   font-size: 34px;
 }
 
-.all-units-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 12px;
-  color: var(--blue);
-  text-decoration: none;
-  font-size: 16px;
-  font-weight: 600;
-}
-
-.all-units-link span {
-  font-family: var(--serif);
-  font-size: 30px;
-  line-height: 0.7;
-}
-
-.all-units-link:hover { color: var(--blue-deep); }
-
 .themes-toggle {
   display: none;
   align-items: center;
@@ -132,7 +117,11 @@ a { color: inherit; }
 }
 
 .sidebar {
-  position: relative;
+  position: sticky;
+  top: 0;
+  align-self: start;
+  max-height: 100vh;
+  overflow-y: auto;
   display: flex;
   flex-direction: column;
   min-width: 0;
@@ -179,6 +168,7 @@ a { color: inherit; }
   font-family: var(--serif);
   font-size: 22px;
   font-weight: 700;
+  font-variant-numeric: tabular-nums;
   line-height: 1;
 }
 
@@ -208,23 +198,12 @@ a { color: inherit; }
   font-weight: 700;
 }
 
-.unit-link[aria-current="page"]::before {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  width: 4px;
-  border-radius: 3px 0 0 3px;
-  background: var(--orange);
-  content: "";
-}
 
-.unit-link[aria-current="page"] .unit-number { color: var(--orange); }
+.unit-link[aria-current="page"] .unit-number { color: var(--orange-ink); }
 .unit-link[aria-current="page"] .unit-name { font-weight: 700; }
 
 .unit-link:focus-visible,
-.themes-toggle:focus-visible,
-.all-units-link:focus-visible {
+.themes-toggle:focus-visible {
   outline: 3px solid #74b6ff;
   outline-offset: 3px;
 }
@@ -248,7 +227,7 @@ a { color: inherit; }
 }
 
 .opening {
-  min-height: 92px;
+  min-height: 72px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -263,17 +242,10 @@ a { color: inherit; }
   margin: 0;
   color: var(--ink);
   font-family: var(--serif);
-  font-size: clamp(28px, 3vw, 40px);
+  font-size: clamp(22px, 2.4vw, 28px);
   font-weight: 700;
-  letter-spacing: -1.4px;
-  line-height: 1.12;
-}
-
-.opening p {
-  margin: 5px 0 0;
-  color: #5a6b82;
-  font-size: 16px;
-  line-height: 1.4;
+  letter-spacing: -0.6px;
+  line-height: 1.2;
 }
 
 .school-art {
@@ -293,14 +265,6 @@ a { color: inherit; }
   padding: 0 0 16px 13px;
 }
 
-.unit-heading .unit-index {
-  color: var(--orange);
-  font-size: 19px;
-  font-weight: 750;
-  letter-spacing: 0.02em;
-  white-space: nowrap;
-}
-
 .unit-heading h2 {
   margin: 0;
   color: var(--ink);
@@ -315,15 +279,6 @@ a { color: inherit; }
   padding: 22px 26px 21px;
   border-radius: 10px;
   background: var(--blue-pale);
-}
-
-.focus-label {
-  margin: 0 0 4px;
-  color: var(--blue);
-  font-size: 13px;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
 }
 
 .focus-block h3 {
@@ -560,8 +515,8 @@ a { color: inherit; }
 .reading-passage {
   margin-bottom: 14px;
   padding: 14px 16px;
-  border-left: 3px solid #e7a45e;
-  border-radius: 4px 7px 7px 4px;
+  border: 1px solid #efcfa8;
+  border-radius: 7px;
   background: #f8fbff;
 }
 
@@ -627,7 +582,7 @@ a { color: inherit; }
 .speak-toggle { min-height: 38px; margin: 0 8px 8px 0; padding: 6px 12px; border: 1px solid #c3d3e5; border-radius: 6px; background: white; color: var(--blue-deep); font: inherit; font-size: 13px; font-weight: 650; cursor: pointer; }
 .speak-toggle:hover, .speak-toggle[aria-pressed="true"], .speak-toggle[aria-expanded="true"] { border-color: var(--blue); background: #f1f7ff; }
 .speak-toggle:focus-visible, .speak-check input:focus-visible { outline: 3px solid #74b6ff; outline-offset: 2px; }
-.speak-model, .roleplay-model { margin: 0 0 8px; padding: 9px 12px; border-left: 4px solid var(--blue); border-radius: 0 6px 6px 0; background: #f1f7ff; color: var(--ink); font-size: 14px; line-height: 1.55; }
+.speak-model, .roleplay-model { margin: 0 0 8px; padding: 9px 12px; border: 1px solid #b9d3f2; border-radius: 6px; background: #f1f7ff; color: var(--ink); font-size: 14px; line-height: 1.55; }
 .roleplay-model { padding-left: 30px; }
 .roleplay-model li.is-mine { font-weight: 700; }
 .roleplay-you { color: #17683e; font-size: 12px; }
@@ -659,23 +614,6 @@ a { color: inherit; }
 .exercise-feedback strong { color: inherit; }
 .reading-option:focus-visible, .exercise-check:focus-visible, .exercise-card > summary:focus-visible { outline: 3px solid #74b6ff; outline-offset: 2px; }
 
-.site-footer {
-  display: flex;
-  justify-content: space-between;
-  gap: 16px;
-  margin: 24px 3px 0;
-  padding-top: 13px;
-  border-top: 1px solid var(--line);
-  color: #6a7b91;
-  font-size: 12px;
-}
-
-.site-footer span:first-child {
-  color: var(--blue-deep);
-  font-weight: 800;
-  letter-spacing: 0.06em;
-}
-
 @media (max-width: 1050px) {
   .app-layout { grid-template-columns: 285px minmax(0, 1fr); }
   .sidebar { padding-left: 28px; padding-right: 15px; }
@@ -691,10 +629,15 @@ a { color: inherit; }
   .brand { font-size: 27px; }
   .brand b { font-size: 31px; }
   .themes-toggle { display: inline-flex; }
-  .all-units-link { display: none; }
   .app-layout { display: flex; flex-direction: column; min-height: calc(100vh - 72px); }
   .sidebar {
     order: 0;
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    align-self: stretch;
+    max-height: none;
+    overflow: visible;
     padding: 12px 16px 13px;
     border-right: 0;
     border-bottom: 1px solid var(--line);
@@ -728,18 +671,15 @@ a { color: inherit; }
     border-color: #ffc78f;
     background: var(--orange-pale);
   }
-  .unit-link[aria-current="page"]::before { display: none; }
   .unit-number { flex: 0 0 auto; font-size: 17px; }
   .unit-name { font-size: 13px; line-height: 1.22; }
   .unit-chevron { display: none; }
   .main-content { width: 100%; padding: 16px 20px 28px; }
-  .opening { min-height: 0; padding: 4px 0 12px; }
-  .opening h1 { font-size: clamp(26px, 6.5vw, 34px); letter-spacing: -1.2px; }
-  .opening p { max-width: 460px; font-size: 15px; }
+  .opening { min-height: 0; padding: 14px 0 12px; }
+  .opening h1 { font-size: clamp(20px, 5.6vw, 24px); letter-spacing: -0.5px; }
   .school-art { display: none; }
   .lesson { padding-top: 12px; }
   .unit-heading { gap: 10px; padding: 0 0 13px 1px; }
-  .unit-heading .unit-index { font-size: 17px; }
   .unit-heading h2 { font-size: clamp(32px, 7vw, 44px); letter-spacing: -1.25px; }
   .focus-block { padding: 20px 19px; }
   .focus-block h3 { font-size: 29px; }
@@ -768,7 +708,6 @@ a { color: inherit; }
   .match-row { grid-template-columns: 1fr; gap: 6px; }
   .match-answer { grid-column: 1; }
   .exercise-actions { align-items: flex-start; flex-direction: column; gap: 8px; }
-  .site-footer { margin: 20px 0 0; font-size: 11px; }
 }
 
 @media (max-width: 390px) {
@@ -778,7 +717,6 @@ a { color: inherit; }
   .themes-toggle { min-height: 42px; padding: 7px 9px; font-size: 14px; }
   .sidebar { padding-left: 12px; padding-right: 12px; }
   .main-content { padding-right: 15px; padding-left: 15px; }
-  .opening h1 { font-size: 26px; }
   .focus-block { padding: 18px 15px; }
 }
 
@@ -894,3 +832,35 @@ a { color: inherit; }
 .interview-review { margin: 0 0 12px; padding-left: 22px; }
 .interview-review li { margin-bottom: 10px; }
 .interview-review .interview-question { font-size: 15px; }
+
+/* Checked answers can be tried again; a finished section is acknowledged once */
+.exercise-retry {
+  flex: 0 0 auto;
+  min-height: 38px;
+  padding: 7px 14px;
+  border: 1px solid #c3d3e5;
+  border-radius: 6px;
+  background: white;
+  color: var(--blue-deep);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.exercise-retry:hover { border-color: var(--blue); background: #f1f7ff; }
+.exercise-retry:focus-visible { outline: 3px solid #74b6ff; outline-offset: 2px; }
+
+.practice-complete {
+  margin-top: 14px;
+  padding: 12px 14px;
+  border: 1px solid #a3d3b7;
+  border-radius: 8px;
+  background: #f6fcf8;
+  color: var(--ink);
+}
+.practice-complete p { margin: 0; font-size: 15px; line-height: 1.5; }
+.practice-complete strong { color: #17683e; }
+.practice-complete .speak-toggle { margin-top: 10px; }
+
+/* The word review panel follows the jump bar directly; give it the same breathing room as the other sections */
+.section-jump-bar + .lesson-panel { margin: 14px 3px 0; }
