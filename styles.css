@@ -198,16 +198,6 @@ a { color: inherit; }
   font-weight: 700;
 }
 
-.unit-link[aria-current="page"]::before {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  width: 4px;
-  border-radius: 3px 0 0 3px;
-  background: var(--orange);
-  content: "";
-}
 
 .unit-link[aria-current="page"] .unit-number { color: var(--orange-ink); }
 .unit-link[aria-current="page"] .unit-name { font-weight: 700; }
@@ -525,8 +515,8 @@ a { color: inherit; }
 .reading-passage {
   margin-bottom: 14px;
   padding: 14px 16px;
-  border-left: 3px solid #e7a45e;
-  border-radius: 4px 7px 7px 4px;
+  border: 1px solid #efcfa8;
+  border-radius: 7px;
   background: #f8fbff;
 }
 
@@ -592,7 +582,7 @@ a { color: inherit; }
 .speak-toggle { min-height: 38px; margin: 0 8px 8px 0; padding: 6px 12px; border: 1px solid #c3d3e5; border-radius: 6px; background: white; color: var(--blue-deep); font: inherit; font-size: 13px; font-weight: 650; cursor: pointer; }
 .speak-toggle:hover, .speak-toggle[aria-pressed="true"], .speak-toggle[aria-expanded="true"] { border-color: var(--blue); background: #f1f7ff; }
 .speak-toggle:focus-visible, .speak-check input:focus-visible { outline: 3px solid #74b6ff; outline-offset: 2px; }
-.speak-model, .roleplay-model { margin: 0 0 8px; padding: 9px 12px; border-left: 4px solid var(--blue); border-radius: 0 6px 6px 0; background: #f1f7ff; color: var(--ink); font-size: 14px; line-height: 1.55; }
+.speak-model, .roleplay-model { margin: 0 0 8px; padding: 9px 12px; border: 1px solid #b9d3f2; border-radius: 6px; background: #f1f7ff; color: var(--ink); font-size: 14px; line-height: 1.55; }
 .roleplay-model { padding-left: 30px; }
 .roleplay-model li.is-mine { font-weight: 700; }
 .roleplay-you { color: #17683e; font-size: 12px; }
@@ -642,7 +632,9 @@ a { color: inherit; }
   .app-layout { display: flex; flex-direction: column; min-height: calc(100vh - 72px); }
   .sidebar {
     order: 0;
-    position: relative;
+    position: sticky;
+    top: 0;
+    z-index: 5;
     align-self: stretch;
     max-height: none;
     overflow: visible;
@@ -679,7 +671,6 @@ a { color: inherit; }
     border-color: #ffc78f;
     background: var(--orange-pale);
   }
-  .unit-link[aria-current="page"]::before { display: none; }
   .unit-number { flex: 0 0 auto; font-size: 17px; }
   .unit-name { font-size: 13px; line-height: 1.22; }
   .unit-chevron { display: none; }
@@ -841,3 +832,35 @@ a { color: inherit; }
 .interview-review { margin: 0 0 12px; padding-left: 22px; }
 .interview-review li { margin-bottom: 10px; }
 .interview-review .interview-question { font-size: 15px; }
+
+/* Checked answers can be tried again; a finished section is acknowledged once */
+.exercise-retry {
+  flex: 0 0 auto;
+  min-height: 38px;
+  padding: 7px 14px;
+  border: 1px solid #c3d3e5;
+  border-radius: 6px;
+  background: white;
+  color: var(--blue-deep);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.exercise-retry:hover { border-color: var(--blue); background: #f1f7ff; }
+.exercise-retry:focus-visible { outline: 3px solid #74b6ff; outline-offset: 2px; }
+
+.practice-complete {
+  margin-top: 14px;
+  padding: 12px 14px;
+  border: 1px solid #a3d3b7;
+  border-radius: 8px;
+  background: #f6fcf8;
+  color: var(--ink);
+}
+.practice-complete p { margin: 0; font-size: 15px; line-height: 1.5; }
+.practice-complete strong { color: #17683e; }
+.practice-complete .speak-toggle { margin-top: 10px; }
+
+/* The word review panel follows the jump bar directly; give it the same breathing room as the other sections */
+.section-jump-bar + .lesson-panel { margin: 14px 3px 0; }
