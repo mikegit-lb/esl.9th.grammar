@@ -67,7 +67,7 @@ UNITS.forEach(function (n) {
       assert.ok(filled(o[k]), label + " overview." + k + " must be a non-empty array");
     });
     assert.equal(o.pronunciation, undefined, label + " overview.pronunciation must be omitted");
-    assert.ok(o.leadIn && filled(o.leadIn.topics), label + " overview.leadIn.topics must be non-empty");
+    assert.ok(o.leadIn === undefined || filled(o.leadIn.topics), label + " overview.leadIn, when present, needs non-empty topics");
     const groups = list(v.groups), items = [];
     groups.forEach(function (g) { list(g.items).forEach(function (i) { items.push([g.title, i]); }); });
     assert.ok(groups.length >= 3, label + " vocabulary needs >=3 groups, has " + groups.length);

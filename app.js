@@ -123,7 +123,6 @@ function renderGrammarBlock(unit) {
   }).join("");
 
   return '<section class="focus-block" aria-labelledby="focus-title">' +
-      '<p class="focus-label">Grammar focus</p>' +
       '<h3 id="focus-title">' + escapeHtml(unit.focus) + '</h3>' +
       '<p class="focus-summary">' + escapeHtml(unit.summary) + '</p>' +
       '<ul class="example-list">' + examples + '</ul>' +
@@ -171,10 +170,7 @@ function renderSectionBody(unit, content) {
   const activities = currentActivities();
   if (activeSection === "grammar") {
     const mergedLesson = Object.assign({}, unit, content && content.lesson);
-    const questionTotal = activities.reduce(function (n, a) { return n + Core.countQuestions(a); }, 0);
-    const jump = typeof sectionJumpBar === "function"
-      ? sectionJumpBar((mergedLesson.patterns || []).length + " patterns · " + activities.length + " practice sets (" + questionTotal + " questions)", "Jump to grammar practice ↓")
-      : "";
+    const jump = sectionJumpBar((mergedLesson.patterns || []).length + " patterns · " + activities.length + " practice sets", "Jump to grammar practice ↓");
     return jump + renderGrammarBlock(mergedLesson) + renderExercises(activities, { heading: "Grammar practice" });
   }
   return renderExercises(activities, { heading: "Reading practice" });
@@ -187,7 +183,6 @@ function renderLesson() {
   const sections = Core.getSections(content);
   const heading =
     '<header class="unit-heading">' +
-      '<span class="unit-index">' + unit.number + ' /</span>' +
       '<h2>' + escapeHtml(unit.title) + '</h2>' +
     '</header>';
 
